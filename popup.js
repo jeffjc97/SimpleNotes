@@ -108,18 +108,20 @@ function SaveNote() {
 }
 
 function AddNote() {
-	console.log("Add")
-	total = total + 1
-	console.log("add note total: " + total)
+	if ($('.note').first().find('.note-text').text() != "New Note") {
+		console.log("Add")
+		total = total + 1
+		console.log("add note total: " + total)
 
-	// adding in frontend
-	var dateArray = GetDate()
-	var new_note = $('<li note-id="' + total + '" class="note"><div class="note-text">' + 'New Note' + '</div><div class="date">' + FormatDate(dateArray, 'date') + '</div></li>')
-	$('#notes-list').prepend(new_note)
-	new_note.click(function() {
-		SelectNote($(this).attr('note-id'))
-	})
-	SelectNote(total, true)
+		// adding in frontend
+		var dateArray = GetDate()
+		var new_note = $('<li note-id="' + total + '" class="note"><div class="note-text">' + 'New Note' + '</div><div class="date">' + FormatDate(dateArray, 'date') + '</div></li>')
+		$('#notes-list').prepend(new_note)
+		new_note.click(function() {
+			SelectNote($(this).attr('note-id'))
+		})
+		SelectNote(total, true)
+	}	
 	// not adding in backend yet because I only want to save it if the user types something
 }
 
