@@ -37,25 +37,36 @@ function LoadNotes(result) {
 			});
 
 			console.log(notes)
+			var toDelete = [];
+			var noteReached = false;
 			for (i=0; i<notes.length; i++) {
 				var date = new Date(notes[i]['date'])
 				var text = notes[i]['contents']
-				if (text == '') {text = 'New Note'}
-			    var individual_note = $('<li note-id="' + notes[i]['id'] + '" class="note"><div class="note-text">' + notes[i]['contents'] + '</div><div class="date">' + FormatDate(GetDate(date), 'date') + '</div></li>')
-			   	if(i == 0) {
-			   		// just call the other function
-			    	individual_note.addClass('active')
-			    	$('#edit-note').val(notes[i]['contents'])
-			    	$('#edit-note').attr('note-id', notes[i]['id'])
-					var strDateTime = FormatDate(GetDate(date), 'full')
-					$('#header-time').text(strDateTime)
-			    }
-			    
-			    $('#notes-list').append(individual_note)
-				$('.note').click(function() {
-					SelectNote($(this).attr('note-id'))
-				})
+				if (text != '') {
+				    var individual_note = $('<li note-id="' + notes[i]['id'] + '" class="note"><div class="note-text">' + notes[i]['contents'] + '</div><div class="date">' + FormatDate(GetDate(date), 'date') + '</div></li>')
+				   	if(!noteReached) {
+				   		// just call the other function
+				    	individual_note.addClass('active')
+				    	$('#edit-note').val(notes[i]['contents'])
+				    	$('#edit-note').attr('note-id', notes[i]['id'])
+						var strDateTime = FormatDate(GetDate(date), 'full')
+						$('#header-time').text(strDateTime)
+						noteReached = true;
+				    }
+				    
+				    $('#notes-list').append(individual_note)
+					$('.note').click(function() {
+						SelectNote($(this).attr('note-id'))
+					})
+				}
+				else {
+					toDelete.push(i)
+				}
 			}
+			for(i=0; i<toDelete.length; i++) {
+				notes.splice(i, 1);
+			}
+			chrome.storage.sync.set({'total':total, 'notes':notes})	
 		}
 	}
 }
@@ -104,7 +115,12 @@ function SaveNote() {
 	$('#header-time').text(FormatDate(GetDate(), 'full'))
 	$('#notes-list').prepend($('#notes-list').find('[note-id="' + id + '"]'));
 	$('#notes-list').find('[note-id="' + id + '"]').find('.date').text(FormatDate(GetDate(), 'date'))	
-	$('#notes-list').find('[note-id="' + id + '"]').find('.note-text').text(text)
+	if(text != '') {
+		$('#notes-list').find('[note-id="' + id + '"]').find('.note-text').text(text)
+	}
+	else {
+		$('#notes-list').find('[note-id="' + id + '"]').find('.note-text').text('New Note')
+	}
 }
 
 function AddNote() {
@@ -126,24 +142,25 @@ function AddNote() {
 }
 
 function DeleteNote(id) {
-	console.log("Delete")
-
-	// deleting in backend
-	index = _.findIndex(notes, function(e) { return e.id == id })
-	notes.splice(index, 1)
-	chrome.storage.sync.set({'total':total, 'notes':notes})
-	// deleting in frontend
-	if ($('.note').length == 1) {
-		AddNote()
-	}
-	else {
-		var switch_id = $('#notes-list').find('[note-id="' + id + '"]').prev().attr('note-id')
-		if (switch_id === undefined) {
-			switch_id = $('#notes-list').find('[note-id="' + id + '"]').next().attr('note-id')
+	console.log("Delete");
+	if ($('.note.active').find('.note-text').text() != "New Note") {
+		// deleting in backend
+		index = _.findIndex(notes, function(e) { return e.id == id })
+		notes.splice(index, 1)
+		chrome.storage.sync.set({'total':total, 'notes':notes})
+		// deleting in frontend
+		if ($('.note').length == 1) {
+			AddNote()
 		}
-		SelectNote(switch_id)
+		else {
+			var switch_id = $('#notes-list').find('[note-id="' + id + '"]').prev().attr('note-id')
+			if (switch_id === undefined) {
+				switch_id = $('#notes-list').find('[note-id="' + id + '"]').next().attr('note-id')
+			}
+			SelectNote(switch_id)
+		}
+		$('#notes-list').find('[note-id="' + id + '"]').remove()
 	}
-	$('#notes-list').find('[note-id="' + id + '"]').remove()
 }
 
 // gets array with all info about date

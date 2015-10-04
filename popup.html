@@ -16,6 +16,11 @@
 				list-style: none;
 				margin-left: 0;
 				width: 150px;
+				overflow: scroll;
+			}
+			#list-div {
+				height: 273px;
+    			overflow: scroll;
 			}
 			.note {
 				margin-left: -40px;
@@ -93,7 +98,7 @@
 	<body>
 		<div id="notes-list-container">
 			<input type="text" class="form-control" id="search-notes" placeholder="Search">
-			<ul id="notes-list"></ul>
+			<div id="list-div"><ul id="notes-list"></ul></div>
 		</div>
 		<div id="active-note">
 			<div id="header">
