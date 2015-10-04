@@ -17,9 +17,9 @@ var months = {
 
 // load in the notes for the left hand column
 function LoadNotes(result) {
-	console.log(result);
+	// console.log(result);
 	if(result == undefined) {
-		console.log("load notes total: " + total)
+		// console.log("load notes total: " + total)
 		notes = []
 		AddNote()
 	}
@@ -36,7 +36,7 @@ function LoadNotes(result) {
 			    return a>b ? -1 : a<b ? 1 : 0;
 			});
 
-			console.log(notes)
+			// console.log(notes)
 			var toDelete = [];
 			var noteReached = false;
 			for (i=0; i<notes.length; i++) {
@@ -73,22 +73,26 @@ function LoadNotes(result) {
 
 // switch to another note
 function SelectNote(id, is_new) {
-	$('.active').removeClass('active-alt')
-	$('.active').removeClass('active')
-	$('[note-id="' + id + '"]').addClass('active')
-	$('#edit-note').attr('note-id', id)
+	$('.active').removeClass('active-alt');
+	$('.active').removeClass('active');
+	$('[note-id="' + id + '"]').addClass('active');
+	$('#edit-note').attr('note-id', id);
 	if (typeof is_new === 'undefined') {
 		var result = $.grep(notes, function(e){ return e.id == id; })[0];
-		var text = result['contents']
-		$('#edit-note').val(text)
-		var date = new Date(result['date'])
-		var strDateTime = FormatDate(GetDate(date), 'full')	
+		var text = '';
+		var date = new Date();
+		if(result !== undefined) {
+			text = result['contents'];
+			date = new Date(result['date']);
+		}
+		$('#edit-note').val(text);
+		var strDateTime = FormatDate(GetDate(date), 'full')	;
 	}
 	else {
-		$('#edit-note').val('')
-		var strDateTime = FormatDate(GetDate(), 'full')
+		$('#edit-note').val('');
+		var strDateTime = FormatDate(GetDate(), 'full');
 	}
-	$('#header-time').text(strDateTime)
+	$('#header-time').text(strDateTime);
 }
 
 function SaveNote() {
@@ -107,8 +111,8 @@ function SaveNote() {
 		notes[index]['contents'] = text
 		notes[index]['date'] = String(date);
 	}
-	console.log(" save note total: " + total)
-	console.log("notes: " + notes)
+	// console.log(" save note total: " + total)
+	// console.log("notes: " + notes)
 	chrome.storage.sync.set({'total':total, 'notes':notes})
 
 	// updating front end
@@ -125,9 +129,9 @@ function SaveNote() {
 
 function AddNote() {
 	if ($('.note').first().find('.note-text').text() != "New Note") {
-		console.log("Add")
+		// console.log("Add")
 		total = total + 1
-		console.log("add note total: " + total)
+		// console.log("add note total: " + total)
 
 		// adding in frontend
 		var dateArray = GetDate()
@@ -142,7 +146,7 @@ function AddNote() {
 }
 
 function DeleteNote(id) {
-	console.log("Delete");
+	// console.log("Delete");
 	if ($('.note.active').find('.note-text').text() != "New Note") {
 		// deleting in backend
 		index = _.findIndex(notes, function(e) { return e.id == id })
@@ -197,9 +201,9 @@ function FormatDate(dateArray, type) {
 function Search() {
 	var search = $('#search-notes').val().toLowerCase()
 	$('.note').each(function() {
-		console.log(search)
-		console.log($(this).find('.note-text').text());
-		console.log($(this).find('.note-text').text().toLowerCase().indexOf(search))    
+		// console.log(search)
+		// console.log($(this).find('.note-text').text());
+		// console.log($(this).find('.note-text').text().toLowerCase().indexOf(search))    
 		if ($(this).find('.note-text').text().toLowerCase().indexOf(search) === -1) {
 			$(this).hide()
 		}
@@ -213,7 +217,7 @@ function Search() {
 document.addEventListener('DOMContentLoaded', function() {
 	chrome.storage.sync.get('total', function(result) {
 		total = result['total'];
-		console.log("start total: " + total);
+		// console.log("start total: " + total);
 		if(total === undefined) {
 			total = 0;
 			LoadNotes()
